@@ -366,23 +366,60 @@ if __name__ == '__main__':
 
 
     #These are the constraints on the system, they will include both bounds constraints and conservation constraints.
-    constraints = [
-        lambda theta_A, theta_E, theta_F, theta_G, theta_I, theta_L, theta_M, theta_N, theta_O, theta_R,
-               theta_S, theta_U, theta_V, theta_X, free, theta_H, theta_OH, theta_H2O, theta_CH, theta_CH2,
-               theta_CH3, theta_CH4, theta_CHO, theta_CH2O, theta_CH3O, theta_CH3OH, theta_W, theta_T, theta_B, theta_J,
-               theta_P, theta_C, theta_D, theta_K, theta_Q, theta_Y, theta_Z, theta_Z1, theta_CO: (minBounds[0] <= theta_A <= maxBounds[0]) == True,
-        lambda theta_A, theta_E, theta_F, theta_G, theta_I, theta_L, theta_M, theta_N, theta_O, theta_R,
-               theta_S, theta_U, theta_V, theta_X, free, theta_H, theta_OH, theta_H2O, theta_CH, theta_CH2,
-               theta_CH3, theta_CH4, theta_CHO, theta_CH2O, theta_CH3O, theta_CH3OH, theta_W, theta_T, theta_B, theta_J,
-               theta_P, theta_C, theta_D, theta_K, theta_Q, theta_Y, theta_Z, theta_Z1, theta_CO: (minBounds[1] <= theta_E <= maxBounds[1]) == True,
-        lambda theta_A, theta_E, theta_F, theta_G, theta_I, theta_L, theta_M, theta_N, theta_O, theta_R,
-               theta_S, theta_U, theta_V, theta_X, free, theta_H, theta_OH, theta_H2O, theta_CH, theta_CH2,
-               theta_CH3, theta_CH4, theta_CHO, theta_CH2O, theta_CH3O, theta_CH3OH, theta_W, theta_T, theta_B, theta_J,
-               theta_P, theta_C, theta_D, theta_K, theta_Q, theta_Y, theta_Z, theta_Z1, theta_CO: (minBounds[2] <= theta_F <= maxBounds[2]) == True
-    ]
+    def constraints(theta_A,
+                    theta_E,
+                    theta_F,
+                    theta_G,
+                    theta_I,
+                    theta_L,
+                    theta_M,
+                    theta_N,
+                    theta_O,
+                    theta_R,
+                    theta_S,
+                    theta_U,
+                    theta_V,
+                    theta_X,
+                    free,
+                    theta_H,
+                    theta_OH,
+                    theta_H2O,
+                    theta_CH,
+                    theta_CH2,
+                    theta_CH3,
+                    theta_CH4,
+                    theta_CHO,
+                    theta_CH2O,
+                    theta_CH3O,
+                    theta_CH3OH,
+                    theta_W,
+                    theta_T,
+                    theta_B,
+                    theta_J,
+                    theta_P,
+                    theta_C,
+                    theta_D,
+                    theta_K,
+                    theta_Q,
+                    theta_Y,
+                    theta_Z,
+                    theta_Z1,
+                    theta_CO
+                ):
+
+        #add all thetas into a big list, then do the bounds check in a loop and return some diff value to help the solver converge.
+
+        bounds = [
+            lambda : 0 if ((minBounds[0] <= theta_A <= maxBounds[0]) == True) else 1,
+            lambda : 0 if ((minBounds[1] <= theta_E <= maxBounds[1]) == True) else 1,
+            lambda : 0 if ((minBounds[2] <= theta_F <= maxBounds[2]) == True) else 1
+        ]
+
+        return [f() for f in bounds]
+    
 
     #Actually solve our system of equations:
-    #NLSystem = findroot([coverage] + constraints, initialState, solver='secant', verbose=True, verify=False)
+    #NLSystem = findroot([coverage, constraints], initialState, solver='secant', verbose=True, verify=False)
     NLSystem = findroot(coverage, initialState, solver='mnewton', verbose=False, verify=False)
 
 
@@ -392,19 +429,22 @@ if __name__ == '__main__':
     i = 0
     print("FORWARD REACTION RATES:")
     for x in fr:
-        print("r_f["+str(i)+"] = "+nstr(x))
+        print("{:<11}".format( "r_f[" + str(i) + "]" ) +
+              "{:<10}".format( " = " + nstr(x) ) )
         i += 1
 
     i = 0
     print("REVERSE REACTION RATES:")
     for x in rr:
-        print("r_b["+str(i)+"] = "+nstr(x))
+        print("{:<11}".format( "r_b[" + str(i) + "]" ) +
+              "{:<10}".format( " = " + nstr(x) ) )
         i += 1
 
     i = 0
     print("TOTAL REACTION RATES:")
     for x in tr:
-        print("r["+str(i)+"] = "+nstr(x))
+        print("{:<11}".format( "r[" + str(i) + "]" ) +
+              "{:<10}".format( " = " + nstr(x) ) )
         i += 1
 
     thetasList = [
@@ -417,13 +457,15 @@ if __name__ == '__main__':
     i = 0
     print("THETAS:")
     for x in NLSystem:
-        print(thetasList[i]+" = "+nstr(x))
+        print("{:<11}".format( thetasList[i] ) +
+              "{:<10}".format( " = " + nstr(x) ) )
         i += 1
 
     i = 0
     print("STEADY STATE APPROX.:")
     for x in ss:
-        print("out["+str(i)+"] = "+nstr(x))
+        print("{:<11}".format( "out[" + str(i) + "]" ) +
+              "{:<10}".format( " = " + nstr(x) ) )
         i += 1
 
 
